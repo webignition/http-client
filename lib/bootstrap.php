@@ -1,6 +1,5 @@
 <?php
 namespace webignition\Http\Client;
-ini_set('display_errors', 'On');
 
 function autoload( $rootDir ) {
     spl_autoload_register(function( $className ) use ( $rootDir ) {        
