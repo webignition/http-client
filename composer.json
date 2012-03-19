@@ -1,0 +1,18 @@
+{
+    "name": "webignition/http-client",
+    "description": "Caching HTTP Client",
+    "keywords": ["http", "caching", "client"],
+    "homepage": "https://github.com/webignition/http-client",
+    "type": "library",
+    "license": "WTFPL",
+    "authors": [
+        {
+            "name": "Jon Cram",
+            "email": "jon@webignition.net"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.0",
+        "ext-http": "*"
+    }
+}
