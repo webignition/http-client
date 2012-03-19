@@ -1,0 +1,45 @@
+array(7) {
+  ["Cache-Control"]=>
+  string(18) "public, max-age=60"
+  ["Content-Type"]=>
+  string(24) "text/html; charset=utf-8"
+  ["Expires"]=>
+  string(29) "Sun, 30 Jan 2011 16:57:21 GMT"
+  ["Last-Modified"]=>
+  string(29) "Sun, 30 Jan 2011 16:56:21 GMT"
+  ["Vary"]=>
+  string(1) "*"
+  ["Date"]=>
+  string(29) "Sun, 30 Jan 2011 16:56:20 GMT"
+  ["Content-Length"]=>
+  string(5) "37063"
+}
+
+    Cache-Control   = "Cache-Control" ":" 1#cache-directive
+
+    cache-directive = cache-request-directive
+         | cache-response-directive
+
+    cache-request-directive =
+           "no-cache"                          ; Section 14.9.1
+         | "no-store"                          ; Section 14.9.2
+         | "max-age" "=" delta-seconds         ; Section 14.9.3, 14.9.4
+         | "max-stale" [ "=" delta-seconds ]   ; Section 14.9.3
+         | "min-fresh" "=" delta-seconds       ; Section 14.9.3
+         | "no-transform"                      ; Section 14.9.5
+         | "only-if-cached"                    ; Section 14.9.4
+         | cache-extension                     ; Section 14.9.6
+
+     cache-response-directive =
+           "public"                               ; Section 14.9.1
+         | "private" [ "=" <"> 1#field-name <"> ] ; Section 14.9.1
+         | "no-cache" [ "=" <"> 1#field-name <"> ]; Section 14.9.1
+         | "no-store"                             ; Section 14.9.2
+         | "no-transform"                         ; Section 14.9.5
+         | "must-revalidate"                      ; Section 14.9.4
+         | "proxy-revalidate"                     ; Section 14.9.4
+         | "max-age" "=" delta-seconds            ; Section 14.9.3
+         | "s-maxage" "=" delta-seconds           ; Section 14.9.3
+         | cache-extension                        ; Section 14.9.6
+
+    cache-extension = token [ "=" ( token | quoted-string ) ]
