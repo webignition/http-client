@@ -11,6 +11,21 @@ Responses are cached according to [RFC2616 section 13][3].
 [2]: http://php.net/manual/en/class.httpmessage.php "PHP HttpMessage"
 [3]: http://www.w3.org/Protocols/rfc2616/rfc2616-sec13.html "Caching in HTTP"
 
+Building
+--------
+
+This project has external dependencies managed with [composer][1]. Get and install this first.
+
+    # Make a suitable project directory
+    mkdir ~/http-client && cd ~/http-client
+
+    # Clone repository
+    git clone git@github.com:webignition/http-client.git.
+
+    # Retrieve/update dependencies
+    composer.phar update
+
+
 Usage
 -----
 
