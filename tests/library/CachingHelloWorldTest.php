@@ -1,8 +1,7 @@
 <?php
 namespace webignition\Http\Client\Test;
 
-class HelloWorldTest extends \webignition\Http\Client\Test\Test {
-    
+class CachingHelloWorldTest extends \webignition\Http\Client\Test\Test {    
     
     public function run() {
         $this->client()->getStore()->clear();
