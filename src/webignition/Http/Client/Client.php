@@ -10,10 +10,22 @@ namespace webignition\Http\Client;
  * @package webignition\Http\Client
  *
  */
-class Client {   
+class Client {
     
+    
+    /**
+     *
+     * @var \webignition\Http\Response\RedirectHandler\RedirectHandler 
+     */
     private $redirectHandler = null;
     
+    /**
+     * Whether to output URLs being redirected to; for debugging purposes only
+     * 
+     * @var boolean 
+     */
+    private $outputRedirectUrls = false;
+   
     
     /**
      *
@@ -23,14 +35,26 @@ class Client {
     public function getResponse(\HttpRequest $request) {
         $response = $request->send();
         
-        while ($this->redirectHandler()->followRedirectFor($response->getResponseCode()) && !$this->redirectHandler()->isLimitReached()) {
-            $request->setUrl($response->getHeader('Location'));
+        while ($this->redirectHandler()->followRedirectFor($response->getResponseCode()) && !$this->redirectHandler()->isLimitReached()) { 
+            $request->setUrl($this->redirectHandler()->getLocation($request, $response));
+            if ($this->outputRedirectUrls === true) {
+                echo '['.$response->getResponseCode().'] Redirecting to: '.$request->getUrl()."\n";
+            }            
+            
             $this->redirectCount++;
             $response = $request->send();
         }
         
         return $response;
     }
+    
+    public function enableOutputRedirectUrls() {
+        $this->outputRedirectUrls = true;
+    }    
+    
+    public function disableOutputRedirectUrls() {
+        $this->outputRedirectUrls = false;
+    }    
     
     
     /**

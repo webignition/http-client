@@ -138,6 +138,23 @@ class RedirectHandler {
     private function disableFollowRedirectFor($forResponseCode) {
         $this->followRedirectFor[$forResponseCode] = false;
 
-    }    
+    } 
+    
+    
+    /**
+     * Get redirect location, derived from Location header in HTTP response
+     * 
+     * Location value should be an absolute URL. Some HTTP servers return a
+     * relative URL. If so, we need to examine the request URL and response location
+     * header and derive the absolute location URL.
+     * 
+     * @param \HttpRequest $request
+     * @param \HttpMessage $response
+     * @return string 
+     */
+    public function getLocation(\HttpRequest $request, \HttpMessage $response) {
+        $absoluteUrl = new \webignition\AbsoluteUrlDeriver\AbsoluteUrl($response->getHeader('Location'), $request->getUrl());
+        return $absoluteUrl->getUrl();
+    }
 
 }

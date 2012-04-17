@@ -2,3 +2,5 @@
 .DS_Store
 /nbproject
 /tests/www/diskStore
+/vendor
+/composer.lock
