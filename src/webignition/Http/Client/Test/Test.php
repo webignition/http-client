@@ -35,6 +35,7 @@ abstract class Test {
         
         $this->run();
         echo $this->output;
+        echo "\n";
     }
     
     
