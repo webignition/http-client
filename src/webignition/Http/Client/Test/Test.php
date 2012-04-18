@@ -28,16 +28,35 @@ abstract class Test {
      */
     private $timerStartTime = null;
     
+    
+    /**
+     * Allows a test to disable itself, we may want to only run
+     * a subset of tests when developing against a failing test
+     * 
+     * @var boolean
+     */
+    private $isEnabled = true;
+    
     abstract public function run();
     
-    public function execute() {
-        $this->output("Executing ".get_class($this)."\n");
+    
+    public function execute() {        
+        if ($this->isEnabled === true) {
+            $this->output("Executing ".get_class($this)."\n");
         
-        $this->run();
-        echo $this->output;
-        echo "\n";
+            $this->run();
+            echo $this->output;
+            echo "\n";
+        }
     }
     
+    protected function enable() {
+        $this->isEnabled = true;
+    }
+    
+    protected function disable() {
+        $this->isEnabled = false;
+    }    
     
     /**
      *

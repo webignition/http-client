@@ -1,7 +1,15 @@
 <?php
 namespace webignition\Http\Client\Test;
 
-class CachingHelloWorldTest extends \webignition\Http\Client\Test\Test {    
+/**
+ * Compares cached to non-cached retrieval time
+ *  
+ */
+class CachingHelloWorldTest extends \webignition\Http\Client\Test\Test {
+    
+    public function __construct() {
+        $this->enable();
+    }
     
     public function run() {
         $this->client()->getStore()->clear();

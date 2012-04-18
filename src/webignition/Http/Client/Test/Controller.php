@@ -88,7 +88,7 @@ class Controller {
     
     
     public function runTests() {
-        foreach ($this->tests() as $currentTest) {
+        foreach ($this->tests() as $currentTest) {            
             $currentTest->setClient($this->client());            
             $currentTest->execute();
         }

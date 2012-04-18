@@ -10,14 +10,20 @@ namespace webignition\Http\Client;
  * @package webignition\Http\Client
  *
  */
-class Client {
+class Client { 
     
+    /**
+     *
+     * @var \webignition\Http\Request\Sender
+     */
+    private $sender = null;
     
     /**
      *
      * @var \webignition\Http\Response\RedirectHandler\RedirectHandler 
      */
     private $redirectHandler = null;
+    
     
     /**
      * Whether to output URLs being redirected to; for debugging purposes only
@@ -32,8 +38,8 @@ class Client {
      * @param \HttpRequest $request
      * @return \HttpMessage
      */
-    public function getResponse(\HttpRequest $request) {
-        $response = $request->send();
+    public function getResponse(\HttpRequest $request) {        
+        $response = $this->sender()->send($request);
         
         while ($this->redirectHandler()->followRedirectFor($response->getResponseCode()) && !$this->redirectHandler()->isLimitReached()) { 
             $request->setUrl($this->redirectHandler()->getLocation($request, $response));
@@ -54,7 +60,20 @@ class Client {
     
     public function disableOutputRedirectUrls() {
         $this->outputRedirectUrls = false;
-    }    
+    }
+    
+    
+    /**
+     * 
+     * @return \webignition\Http\Request\Sender
+     */
+    public function sender() {
+        if (is_null($this->sender)) {
+            $this->sender = new \webignition\Http\Request\Sender();
+        }
+        
+        return $this->sender;
+    }
     
     
     /**
@@ -67,6 +86,6 @@ class Client {
         }
         
         return $this->redirectHandler;
-    }  
+    } 
 
 }
