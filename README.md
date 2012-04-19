@@ -5,7 +5,10 @@ It's an HTTP client. Like, a client, talking over HTTP, to a web server. It's a 
 
 You give it a regular [HttpRequest][1] and it gives you back a regular [HttpMessage][2] object.
 
-Responses are cached according to [RFC2616 section 13][3].
+* caches responses according to [RFC2616 section 13][3]
+* follows 30X redirects
+* retries on timeouts
+* gracefully handles (some) recoverable exception cases
 
 [1]: http://php.net/manual/en/class.httprequest.php "PHP HttpRequest"
 [2]: http://php.net/manual/en/class.httpmessage.php "PHP HttpMessage"
