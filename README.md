@@ -57,17 +57,16 @@ Usage
     echo microtime(true) - $before;
 
 This gives results something like:
-<pre>
+
     0.41171598 
     0.05855584 <- cached response retrieved from disk
-</pre>
 
 ### Following Redirects
 
     $client = new \webignition\Http\Client\Client();
     $client->redirectHandler()->enable();
     $client->enableOutputRedirectUrls(); // For debugging
-        
+
     $request = new \HttpRequest('http://www.ecdl.co.uk');
     $client->getResponse($request); // Debug logging of redirects occurs during request
 
