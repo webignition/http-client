@@ -32,13 +32,15 @@ This project has external dependencies managed with [composer][1]. Get and insta
 Usage
 -----
 
-### The "Hello World" example
+### Caching
+
+#### The "Hello World" example
 
     $httpClient = new \webignition\Http\Client\CachingClient();
     $request = new \HttpRequest('http://www.google.co.uk/search?q=Hello+World');
     $response = $httpClient->getResponse($request);
 
-### The "Hello World" timed test
+#### The "Hello World" timed test
 
     $httpClient = new \webignition\Http\Client\CachingClient();
     $httpClient->getStore()->clear();
@@ -59,3 +61,17 @@ This gives results something like:
     0.41171598 
     0.05855584 <- cached response retrieved from disk
 </pre>
+
+### Following Redirects
+
+    $client = new \webignition\Http\Client\Client();
+    $client->redirectHandler()->enable();
+    $client->enableOutputRedirectUrls(); // For debugging
+        
+    $request = new \HttpRequest('http://www.ecdl.co.uk');
+    $client->getResponse($request); // Debug logging of redirects occurs during request
+
+    [301] Redirecting to: http://www.bcs.org/server.php?show=nav.5829
+    [301] Redirecting to: http://www.bcs.org/category/5829
+    [302] Redirecting to: http://www.bcs.org/server.php?controller=category&action=showCategory&contentId=14424
+    [301] Redirecting to: http://www.bcs.org/category/14424
