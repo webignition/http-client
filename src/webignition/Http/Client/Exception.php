@@ -66,19 +66,20 @@ class Exception extends \Exception {
      *
      * @return \HttpRequestException|null 
      */
-    public function getHttpRequestException() {        
-        $previousException = $this->getPrevious();
-        
-        if ($previousException instanceof \HttpRequestException) {
-            return $previousException;
+    public function getHttpRequestException() {
+        $previous = $this->getPrevious();
+        if (is_null($previous)) {
+            return null;
         }
         
-        do {
-            if ($previousException->getPrevious() instanceof \HttpRequestException) {
-                return $previousException->getPrevious();
-            }
-            
-        } while ($previousException->getPrevious() instanceof \Exception);
+        if ($previous instanceof \HttpRequestException) {
+            return $previous;
+        }
+        
+        $previous = $previous->getPrevious();
+        if ($previous instanceof \HttpRequestException) {
+            return $previous;
+        }
         
         return null;
     }
@@ -89,20 +90,21 @@ class Exception extends \Exception {
      * @return \webignition\Http\Client\HttpEncodingException|null 
      */
     public function getHttpEncodingException() {
-        $previousException = $this->getPrevious();
-        
-        if ($previousException instanceof \HttpEncodingException) {
-            return $previousException;
+        $previous = $this->getPrevious();
+        if (is_null($previous)) {
+            return null;
         }
         
-        do {
-            if ($previousException->getPrevious() instanceof \HttpEncodingException) {
-                return $previousException->getPrevious();
-            }
-            
-        } while ($previousException->getPrevious() instanceof \Exception);
+        if ($previous instanceof \HttpEncodingException) {
+            return $previous;
+        }
         
-        return null;        
+        $previous = $previous->getPrevious();
+        if ($previous instanceof \HttpEncodingException) {
+            return $previous;
+        }
+        
+        return null;       
     }
     
     
