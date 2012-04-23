@@ -29,8 +29,8 @@ This project has external dependencies managed with [composer][1]. Get and insta
     composer.phar update
 
 
-Usage
------
+Usage Examples
+--------------
 
 ### Caching
 
@@ -74,3 +74,13 @@ This gives results something like:
     [301] Redirecting to: http://www.bcs.org/category/5829
     [302] Redirecting to: http://www.bcs.org/server.php?controller=category&action=showCategory&contentId=14424
     [301] Redirecting to: http://www.bcs.org/category/14424
+
+### Retrying Requests
+
+    $client = new \webignition\Http\Client\Client();
+    $this->client()->sender()->setRetryLimit(3);
+
+    $request = new \HttpRequest('http://www.google.co.uk/search?q=Hello+World');    
+    $response = $this->client()->getResponse($request);
+
+    # HTTP client will try to send the request up to 3 times before finally failing
