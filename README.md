@@ -62,6 +62,7 @@ echo microtime(true) - $before;
 $before = microtime(true);
 $response = $httpClient->getResponse($request);
 echo microtime(true) - $before;
+?>
 
 This gives results something like:
 
@@ -78,11 +79,12 @@ $client->enableOutputRedirectUrls(); // For debugging
 
 $request = new \HttpRequest('http://www.ecdl.co.uk');
 $client->getResponse($request); // Debug logging of redirects occurs during request
+?>
 
-[301] Redirecting to: http://www.bcs.org/server.php?show=nav.5829
-[301] Redirecting to: http://www.bcs.org/category/5829
-[302] Redirecting to: http://www.bcs.org/server.php?controller=category&action=showCategory&contentId=14424
-[301] Redirecting to: http://www.bcs.org/category/14424
+    [301] Redirecting to: http://www.bcs.org/server.php?show=nav.5829
+    [301] Redirecting to: http://www.bcs.org/category/5829
+    [302] Redirecting to: http://www.bcs.org/server.php?controller=category&action=showCategory&contentId=14424
+    [301] Redirecting to: http://www.bcs.org/category/14424
 
 ### Retrying Requests
 
@@ -95,3 +97,4 @@ $request = new \HttpRequest('http://www.google.co.uk/search?q=Hello+World');
 $response = $this->client()->getResponse($request);
 
 # HTTP client will try to send the request up to 3 times before finally failing
+?>
