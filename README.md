@@ -44,6 +44,7 @@ Usage Examples
 $httpClient = new \webignition\Http\Client\CachingClient();
 $request = new \HttpRequest('http://www.google.co.uk/search?q=Hello+World');
 $response = $httpClient->getResponse($request);
+```
 
 #### The "Hello World" timed test
 
@@ -62,7 +63,7 @@ echo microtime(true) - $before;
 $before = microtime(true);
 $response = $httpClient->getResponse($request);
 echo microtime(true) - $before;
-?>
+```
 
 This gives results something like:
 
@@ -79,7 +80,7 @@ $client->enableOutputRedirectUrls(); // For debugging
 
 $request = new \HttpRequest('http://www.ecdl.co.uk');
 $client->getResponse($request); // Debug logging of redirects occurs during request
-?>
+```
 
     [301] Redirecting to: http://www.bcs.org/server.php?show=nav.5829
     [301] Redirecting to: http://www.bcs.org/category/5829
@@ -97,4 +98,4 @@ $request = new \HttpRequest('http://www.google.co.uk/search?q=Hello+World');
 $response = $this->client()->getResponse($request);
 
 # HTTP client will try to send the request up to 3 times before finally failing
-?>
+```
