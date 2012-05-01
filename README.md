@@ -1,9 +1,6 @@
 Caching HTTP Client
 ===================
 
-* auto-gen TOC:
-{:toc}
-
 Overview
 --------
 
