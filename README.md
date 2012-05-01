@@ -39,25 +39,29 @@ Usage Examples
 
 #### The "Hello World" example
 
-    $httpClient = new \webignition\Http\Client\CachingClient();
-    $request = new \HttpRequest('http://www.google.co.uk/search?q=Hello+World');
-    $response = $httpClient->getResponse($request);
+```php
+<?php
+$httpClient = new \webignition\Http\Client\CachingClient();
+$request = new \HttpRequest('http://www.google.co.uk/search?q=Hello+World');
+$response = $httpClient->getResponse($request);
 
 #### The "Hello World" timed test
 
-    $httpClient = new \webignition\Http\Client\CachingClient();
-    $httpClient->getStore()->clear();
-    $request = new \HttpRequest('http://www.google.co.uk/search?q=Hello+World');
+```php
+<?php
+$httpClient = new \webignition\Http\Client\CachingClient();
+$httpClient->getStore()->clear();
+$request = new \HttpRequest('http://www.google.co.uk/search?q=Hello+World');
 
-    // With an empty cache
-    $before = microtime(true);
-    $response = $httpClient->getResponse($request);
-    echo microtime(true) - $before;
+// With an empty cache
+$before = microtime(true);
+$response = $httpClient->getResponse($request);
+echo microtime(true) - $before;
 
-    // With a populated cache
-    $before = microtime(true);
-    $response = $httpClient->getResponse($request);
-    echo microtime(true) - $before;
+// With a populated cache
+$before = microtime(true);
+$response = $httpClient->getResponse($request);
+echo microtime(true) - $before;
 
 This gives results something like:
 
@@ -66,24 +70,28 @@ This gives results something like:
 
 ### Following Redirects
 
-    $client = new \webignition\Http\Client\Client();
-    $client->redirectHandler()->enable();
-    $client->enableOutputRedirectUrls(); // For debugging
+```php
+<?php
+$client = new \webignition\Http\Client\Client();
+$client->redirectHandler()->enable();
+$client->enableOutputRedirectUrls(); // For debugging
 
-    $request = new \HttpRequest('http://www.ecdl.co.uk');
-    $client->getResponse($request); // Debug logging of redirects occurs during request
+$request = new \HttpRequest('http://www.ecdl.co.uk');
+$client->getResponse($request); // Debug logging of redirects occurs during request
 
-    [301] Redirecting to: http://www.bcs.org/server.php?show=nav.5829
-    [301] Redirecting to: http://www.bcs.org/category/5829
-    [302] Redirecting to: http://www.bcs.org/server.php?controller=category&action=showCategory&contentId=14424
-    [301] Redirecting to: http://www.bcs.org/category/14424
+[301] Redirecting to: http://www.bcs.org/server.php?show=nav.5829
+[301] Redirecting to: http://www.bcs.org/category/5829
+[302] Redirecting to: http://www.bcs.org/server.php?controller=category&action=showCategory&contentId=14424
+[301] Redirecting to: http://www.bcs.org/category/14424
 
 ### Retrying Requests
 
-    $client = new \webignition\Http\Client\Client();
-    $this->client()->sender()->setRetryLimit(3);
+```php
+<?php
+$client = new \webignition\Http\Client\Client();
+$this->client()->sender()->setRetryLimit(3);
 
-    $request = new \HttpRequest('http://www.google.co.uk/search?q=Hello+World');    
-    $response = $this->client()->getResponse($request);
+$request = new \HttpRequest('http://www.google.co.uk/search?q=Hello+World');    
+$response = $this->client()->getResponse($request);
 
-    # HTTP client will try to send the request up to 3 times before finally failing
+# HTTP client will try to send the request up to 3 times before finally failing
