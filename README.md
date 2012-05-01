@@ -1,6 +1,12 @@
 Caching HTTP Client
 ===================
 
+* auto-gen TOC:
+{:toc}
+
+Overview
+--------
+
 It's an HTTP client. Like, a client, talking over HTTP, to a web server. It's a library, you build it into an application that wants to send HTTP requests and get back HTTP responses.
 
 You give it a regular [HttpRequest][1] and it gives you back a regular [HttpMessage][2] object.
