@@ -148,24 +148,37 @@ class DiskStore implements \webignition\Http\Response\Cache\Store\Store {
      * @return \DirectoryIterator
      */
     private function directoryIterator() {
-        if (!@\file_exists($this->directoryPath)) {
+        if (!@\file_exists($this->directoryPath())) {
             throw new \webignition\Http\Response\Cache\DiskStore\Exception(
                 $this->exceptionMessages[self::EXCEPTION_DIRECTORY_PATH_DOES_NOT_EXIST],
                 self::EXCEPTION_DIRECTORY_PATH_DOES_NOT_EXIST
             );
         }
 
-        if (!@\is_dir($this->directoryPath)) {
+        if (!@\is_dir($this->directoryPath())) {
             throw new \webignition\Http\Response\Cache\DiskStore\Exception(
                 $this->exceptionMessages[self::EXCEPTION_DIRECTORY_PATH_DOES_NOT_EXIST],
                 self::EXCEPTION_DIRECTORY_PATH_DOES_NOT_EXIST
             );
         }
 
-        $this->directoryIterator = new \DirectoryIterator($this->directoryPath);
+        $this->directoryIterator = new \DirectoryIterator($this->directoryPath());
        
 
         return $this->directoryIterator;
+    }
+    
+    
+    /**
+     *
+     * @return string
+     */
+    private function directoryPath() {
+        if (!is_dir($this->directoryPath)) {
+            mkdir($this->directoryPath, true);
+        }
+        
+        return $this->directoryPath;
     }
     
     
