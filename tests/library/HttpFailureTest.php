@@ -13,7 +13,7 @@ namespace webignition\Http\Client\Test;
  */
 class HttpFailureTest extends \webignition\Http\Client\Test\Test {    
     
-    const REQUEST_REPEAT_LIMIT = 1000;
+    const REQUEST_REPEAT_LIMIT = 10;
     
     public function __construct() {
         $this->enable();
@@ -24,7 +24,6 @@ class HttpFailureTest extends \webignition\Http\Client\Test\Test {
         
         try {
             for ($requestRepeatCount = 0; $requestRepeatCount < self::REQUEST_REPEAT_LIMIT; $requestRepeatCount++) {
-                $this->client()->getStore()->clear();
                 $this->client()->redirectHandler()->enable();
                 $request = new \HttpRequest('http://www.lextox.co.uk/Home/tabid/59/ctl/Logoff/Default.aspx');             
                 
@@ -38,9 +37,7 @@ class HttpFailureTest extends \webignition\Http\Client\Test\Test {
             var_dump("\n\n===============\n\n");
             var_dump($exception->getPrevious());
         }
-        
-        $this->client()->getStore()->clear();
-        
+
         $this->output(ob_get_clean());
     }    
 }

@@ -7,37 +7,20 @@ namespace webignition\Http\Client\Test;
  */
 class ThreeOhOneFollowTest extends \webignition\Http\Client\Test\Test {
     
-    private $urls = array(
-        'http://www.ecdl.co.uk',
-        'http://www.lextox.co.uk/Home/tabid/59/ctl/Logoff/Default.aspx'
-    );
-    
     public function __construct() {
         $this->enable();
     }    
     
-    public function run() {        
-        $this->client()->redirectHandler()->enable();
-        $this->client()->enableOutputRedirectUrls();
-        
+    public function run() {
         ob_start(); 
+       
+        $client = new \webignition\Http\Client\Client();
+        $client->redirectHandler()->enable();
+        $client->enableOutputRedirectUrls(); // For debugging
         
-        foreach ($this->urls as $url) {
-            echo "Trying ".$url."\n";
-            $this->client()->getStore()->clear();
-            $request = new \HttpRequest($url);      
-            $this->client()->getResponse($request); 
-            $this->client()->getStore()->clear();
-            echo "\n";
-        }
-         
-        $this->client()->disableOutputRedirectUrls();
-        $this->client()->redirectHandler()->disable();     
+        $request = new \HttpRequest('http://www.ecdl.co.uk');
+        $client->getResponse($request); // Debug logging of redirects occurs during request
         
         $this->output(ob_get_clean());        
-    }
-    
-    
-    // 
-    
+    }    
 }

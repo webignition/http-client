@@ -16,13 +16,7 @@ class Controller {
     
     /**
      *
-     * @var \webignition\Http\Response\Cache\DiskStore\DiskStore  
-     */
-    private $diskStore = null;
-    
-    /**
-     *
-     * @var \webignition\Http\Client\CachingClient
+     * @var \webignition\Http\Client\Client
      */
     private $client = null;
     
@@ -53,34 +47,11 @@ class Controller {
     
     /**
      *
-     * @param string $diskStorePath 
-     */
-    public function setDiskStorePath($diskStorePath) {
-        $this->diskStorePath = $diskStorePath;
-    }
-    
-    
-    /**
-     *
-     * @return \webignition\Http\Response\Cache\DiskStore\DiskStore 
-     */
-    private function diskStore() {
-        if (is_null($this->diskStore)) {            
-            $this->diskStore = new \webignition\Http\Response\Cache\DiskStore\DiskStore();          
-        }
-        
-        return $this->diskStore;
-    }
-    
-    
-    /**
-     *
-     * @return \webignition\Http\Client\CachingClient
+     * @return \webignition\Http\Client\Client
      */
     private function client() {
         if (is_null($this->client)) {
-            $this->client = new \webignition\Http\Client\CachingClient();
-            $this->client->setStore($this->diskStore());           
+            $this->client = new \webignition\Http\Client\Client();         
         }
         
         return $this->client;

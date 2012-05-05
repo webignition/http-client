@@ -10,7 +10,7 @@ abstract class Test {
     
     /**
      *
-     * @var \webignition\Http\Client\CachingClient
+     * @var \webignition\Http\Client\Client
      */
     private $client = null;
     
@@ -60,16 +60,16 @@ abstract class Test {
     
     /**
      *
-     * @param \webignition\Http\Client\CachingClient $client 
+     * @param \webignition\Http\Client\Client $client 
      */
-    public function setClient(\webignition\Http\Client\CachingClient $client) {
+    public function setClient(\webignition\Http\Client\Client $client) {
         $this->client = $client;
     }
     
     
     /**
      *
-     * @return \webignition\Http\Client\CachingClient 
+     * @return \webignition\Http\Client\Client 
      */
     protected function client() {
         return $this->client;
