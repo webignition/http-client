@@ -38,7 +38,7 @@ class Client {
      * @param \HttpRequest $request
      * @return \HttpMessage
      */
-    public function getResponse(\HttpRequest $request) {        
+    public function getResponse(\HttpRequest $request) {
         $response = $this->sender()->send($request);
         
         while ($this->redirectHandler()->followRedirectFor($response->getResponseCode()) && !$this->redirectHandler()->isLimitReached()) { 
@@ -48,11 +48,11 @@ class Client {
             }            
             
             $this->redirectCount++;
-            $response = $request->send();
+            $response = $this->sender()->send($request);
         }
         
         return $response;
-    }
+    }     
     
     public function enableOutputRedirectUrls() {
         $this->outputRedirectUrls = true;
