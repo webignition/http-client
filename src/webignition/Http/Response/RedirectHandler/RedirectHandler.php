@@ -153,8 +153,8 @@ class RedirectHandler {
      * @return string 
      */
     public function getLocation(\HttpRequest $request, \HttpMessage $response) {
-        $absoluteUrl = new \webignition\AbsoluteUrlDeriver\AbsoluteUrl($response->getHeader('Location'), $request->getUrl());
-        return $absoluteUrl->getUrl();
+        $absoluteUrl = new \webignition\AbsoluteUrlDeriver\AbsoluteUrlDeriver($response->getHeader('Location'), $request->getUrl());
+        return $absoluteUrl->getAbsoluteUrl();
     }
 
 }
