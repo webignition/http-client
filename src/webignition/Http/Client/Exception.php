@@ -107,6 +107,19 @@ class Exception extends \Exception {
         return null;       
     }
     
+    /**
+     * Get the root underyling exception
+     * 
+     * @return \Exception
+     */
+    public function getRootException() {
+        $rootException = $this->getPrevious();
+        while ($rootException->getPrevious()) {
+            $rootException = $rootException->getPrevious();
+        }
+        
+        return $rootException;
+    }    
     
     /**
      *
