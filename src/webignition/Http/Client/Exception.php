@@ -14,6 +14,7 @@ namespace webignition\Http\Client;
 class Exception extends \Exception {
     
     const CURL_MALFORMED_URL_EXIT_CODE = 3;
+    const CURLE_COULDNT_RESOLVE_HOST = 6;
     const CURL_TIMEOUT_EXIT_CODE = 28;
     
     const INVALID_URL_PREFIX = 'http://localhost/';
@@ -185,4 +186,16 @@ class Exception extends \Exception {
         return $this->getHttpRequestException()->curlCode == self::CURL_TIMEOUT_EXIT_CODE;
     }
     
+    
+    /**
+     *
+     * @return boolean 
+     */
+    public function isDnsLookupFailureException() {
+        if (!$this->getRootException() instanceof \HttpRequestException) {
+            return false;
+        }
+        
+        return $this->getRootException()->curlCode == self::CURLE_COULDNT_RESOLVE_HOST;
+    }
 }
