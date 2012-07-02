@@ -18,7 +18,7 @@ You give it a regular [HttpRequest][1] and it gives you back a regular [HttpMess
 Building
 --------
 
-This project has external dependencies managed with [composer][1]. Get and install this first.
+This project has external dependencies managed with [composer][3]. Get and install this first.
 
     # Make a suitable project directory
     mkdir ~/http-client && cd ~/http-client
@@ -29,6 +29,7 @@ This project has external dependencies managed with [composer][1]. Get and insta
     # Retrieve/update dependencies
     composer.phar update
 
+[3]: http://getcomposer.org
 
 Usage Examples
 --------------
