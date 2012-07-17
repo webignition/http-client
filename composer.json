@@ -1,10 +1,10 @@
 {
     "name": "webignition/http-client",
-    "description": "Caching HTTP Client",
-    "keywords": ["http", "caching", "client"],
+    "description": "HTTP Client with additional reliability over regular HTTP request sending to compensate for timeouts and redirects",
+    "keywords": ["http", "client"],
     "homepage": "https://github.com/webignition/http-client",
     "type": "library",
-    "license": "WTFPL",
+    "license": "MIT",
     "authors": [
         {
             "name": "Jon Cram",
@@ -14,17 +14,10 @@
     "require": {
         "php": ">=5.3.0",
         "ext-http": "*",
-        "webignition/absolute-url-deriver": "*",
+        "webignition/absolute-url-deriver": "1.0",
         "webignition/url": "*"           
     },
-    "repositories": [
-        {
-            "type":"vcs",
-            "url": "https://github.com/webignition/absolute-url-deriver"
-        },
-        {
-            "type":"vcs",
-            "url": "https://github.com/webignition/url"
-        }        
-    ]    
+    "autoload": {
+        "psr-0": { "": "src/" }
+    }   
 }
