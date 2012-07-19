@@ -34,15 +34,6 @@ This project has external dependencies managed with [composer][3]. Get and insta
 Usage Examples
 --------------
 
-### Caching
-
-#### The "Hello World" example
-
-```php
-<?php
-$httpClient = new \webignition\Http\Client\CachingClient();
-$request = new \HttpRequest('http://www.google.co.uk/search?q=Hello+World');
-$response = $httpClient->getResponse($request);
 ```
 ### Following Redirects
 
