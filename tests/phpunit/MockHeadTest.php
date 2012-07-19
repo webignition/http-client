@@ -4,7 +4,7 @@
  * Check the correct mock responses are returned for given requests
  *  
  */
-class MockTest extends PHPUnit_Framework_TestCase {
+class MockHeadTest extends PHPUnit_Framework_TestCase {
 
     public function testSetResponseForRequest() {        
         $client = new \webignition\Http\Mock\Client\Client();
@@ -12,13 +12,13 @@ class MockTest extends PHPUnit_Framework_TestCase {
         $mockResponse = new \HttpMessage($this->getRawMockResponseMessage());
         
         $request = new \HttpRequest('http://webignition.net/robots.txt');
+        $request->setMethod(HTTP_METH_HEAD);
         $client->setResponseForRequest($request, $mockResponse);
         
         $response = $client->getResponse($request);
         
         $this->assertEquals(200, $response->getResponseCode());
         $this->assertEquals('OK', $response->getResponseStatus());
-        $this->assertEquals($this->getRawMockResponseBody(), $response->getBody());
         $this->assertEquals('Thu, 19 Jul 2012 07:53:22 GMT', $response->getHeader('date'));
         $this->assertEquals('Apache', $response->getHeader('server'));
         $this->assertEquals('text/plain', $response->getHeader('content-type'));
@@ -30,13 +30,13 @@ class MockTest extends PHPUnit_Framework_TestCase {
         $mockResponse = new \HttpMessage($this->getRawMockResponseMessage());
         
         $request = new \HttpRequest('http://webignition.net/robots.txt');
-        $client->setResponseForCommand('GET ' . $request->getUrl(), $mockResponse);
+        $request->setMethod(HTTP_METH_HEAD);
+        $client->setResponseForCommand('HEAD ' . $request->getUrl(), $mockResponse);
         
         $response = $client->getResponse($request);
         
         $this->assertEquals(200, $response->getResponseCode());
         $this->assertEquals('OK', $response->getResponseStatus());
-        $this->assertEquals($this->getRawMockResponseBody(), $response->getBody());
         $this->assertEquals('Thu, 19 Jul 2012 07:53:22 GMT', $response->getHeader('date'));
         $this->assertEquals('Apache', $response->getHeader('server'));
         $this->assertEquals('text/plain', $response->getHeader('content-type'));
@@ -51,15 +51,6 @@ ETag: "87625b-49-4c4c9b856a7c0"
 Accept-Ranges: bytes
 Content-Length: 73
 Vary: Accept-Encoding,User-Agent
-Content-Type: text/plain
-
-'.$this->getRawMockResponseBody();        
-    }
-    
-    private function getRawMockResponseBody() {
-        return 'User-Agent: *
-Sitemap: http://webignition.net/sitemap.xml
-Disallow: /cms/';
-    }
-    
+Content-Type: text/plain';        
+    }    
 }

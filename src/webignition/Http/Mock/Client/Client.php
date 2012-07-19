@@ -23,12 +23,19 @@ use webignition\Http\Client\Client as BaseClient;
 class Client extends BaseClient {
     
     
+    const DEFAULT_COMMAND_METHOD = HTTP_METH_GET;
+    
     /**
      * Collection of responses that can be returned
      * 
      * @var array
      */
-    private $responses = array();
+    private $responses = array();    
+    
+    private $httpMethodConstantToString = array(
+        HTTP_METH_GET => 'GET',
+        HTTP_METH_HEAD => 'HEAD'
+    );
     
     /**
      *
@@ -118,8 +125,9 @@ class Client extends BaseClient {
      * @param \HttpRequest $request
      * @return string
      */
-    private function requestToCommand(\HttpRequest $request) {        
-        return 'GET ' . $request->getUrl();
+    private function requestToCommand(\HttpRequest $request) {
+        $method = (array_key_exists($request->getMethod(), $this->httpMethodConstantToString)) ? $this->httpMethodConstantToString[$request->getMethod()] : $this->httpMethodConstantToString[self::DEFAULT_COMMAND_METHOD];
+        return $method . ' ' . $request->getUrl();
     }
     
     
