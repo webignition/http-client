@@ -34,7 +34,6 @@ This project has external dependencies managed with [composer][3]. Get and insta
 Usage Examples
 --------------
 
-```
 ### Following Redirects
 
 ```php
@@ -51,6 +50,7 @@ $client->getResponse($request); // Debug logging of redirects occurs during requ
     [301] Redirecting to: http://www.bcs.org/category/5829
     [302] Redirecting to: http://www.bcs.org/server.php?controller=category&action=showCategory&contentId=14424
     [301] Redirecting to: http://www.bcs.org/category/14424
+    
 
 ### Retrying Requests
 
