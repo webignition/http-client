@@ -64,3 +64,21 @@ $response = $this->client()->getResponse($request);
 
 # HTTP client will try to send the request up to 3 times before finally failing
 ```
+
+Mocking in Tests
+----------------
+
+Applications or libraries dependent on HTTP requests can be hard to test reliably.
+
+If you're testing code that makes and receives actual HTTP requests and responses, your tests can fail not
+due to your code but due to a failure in an HTTP request being sent, a failure in the application generating
+the HTTP response or a failure in the transport layer between your code and the responding HTTP server.
+
+For your tests to rely only on the stability of your code, you need to fake the HTTP process.
+
+The `webignition\Http\Mock\Client\Client` object does just that. You can set `\HttpMessage` response objects
+to be returned for given `\HttpRequest` requests.
+
+So long as your application or library allows dependent `webignition\Http\Mock\Client\Client` to be injected
+at runtime, which is trivial via a `setHttpClient(webignition\Http\Mock\Client\Client $httpClient)` method
+on object that uses such a client, you can safely test with known requests and responses.
