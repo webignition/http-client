@@ -3,10 +3,32 @@ namespace webignition\Http\Mock\Client;
 
 use webignition\Http\Client\Client as BaseClient;
 
+/**
+ * A HTTP client for testing. Useful for testing applications using an Http\Client
+ * that allows the client object to be injected.
+ * 
+ * You can set the response for a given request object or GET command.
+ * 
+ * A 404 response message is returned if no response has been explicity set for a
+ * given request.
+ * 
+ * @todo: Mock \webignition\Http\Request\Sender to allow error-related retrying
+ *         to be tested without issuing actual HTTP requests
+ * 
+ * @todo: Mock \webignition\Http\Response\RedirectHandler\RedirectHandler to allow
+ *         redirect chain following to be tested without issuing actual HTTP
+ *         requests
+ *  
+ */
 class Client extends BaseClient {
     
-    private $responses = array();
     
+    /**
+     * Collection of responses that can be returned
+     * 
+     * @var array
+     */
+    private $responses = array();
     
     /**
      *
@@ -14,7 +36,15 @@ class Client extends BaseClient {
      * @return \HttpMessage
      */    
     public function getResponse(\HttpRequest $request) {
-        return ($this->hasResponseForRequest($request)) ? $this->responses[md5(serialize($request))] : parent::getResponse($request);
+        if ($this->hasResponseForRequest($request)) {
+            return $this->getResponseForRequest($request);
+        }
+        
+        if ($this->hasResponseForCommand($request)) {            
+            return $this->getResponseForCommand($request);
+        } 
+        
+        return $this->getNotFoundResponse();
     }
     
     
@@ -38,8 +68,8 @@ class Client extends BaseClient {
      * @param string $command
      * @param \HttpMessage $response 
      */
-    public function setResponseForCommand($command, \HttpMessage $response) {
-        $this->responses[md5(serialize($command))] = $response;
+    public function setResponseForCommand($command, \HttpMessage $response) {        
+        $this->responses[md5($command)] = $response;
     }
     
     
@@ -50,6 +80,58 @@ class Client extends BaseClient {
      */
     private function hasResponseForRequest(\HttpRequest $request) {
         return isset($this->responses[md5(serialize($request))]);
+    }
+    
+    
+    /**
+     *
+     * @param \HttpRequest $request
+     * @return \HttpMessage 
+     */
+    private function getResponseForRequest(\HttpRequest $request) {
+        return $this->responses[md5(serialize($request))];
+    }
+    
+    
+    /**
+     *
+     * @param string $command 
+     */
+    private function hasResponseForCommand(\HttpRequest $request) {        
+        return isset($this->responses[md5($this->requestToCommand($request))]);
+    }
+    
+    
+    /**
+     *
+     * @param \HttpRequest $request
+     * @return \HttpMessage
+     */
+    private function getResponseForCommand(\HttpRequest $request) {
+        $command = $this->requestToCommand($request);        
+        return $this->responses[md5($command)];
+    }
+    
+    
+    /**
+     *
+     * @param \HttpRequest $request
+     * @return string
+     */
+    private function requestToCommand(\HttpRequest $request) {        
+        return 'GET ' . $request->getUrl();
+    }
+    
+    
+    /**
+     *
+     * @return \HttpMessage 
+     */
+    private function getNotFoundResponse() {
+        return new \HttpMessage('HTTP/1.1 404 Not Found
+Date: Thu, 19 Jul 2012 07:53:22 GMT
+Server: Apache
+Content-Length: 0');          
     }
     
 }
