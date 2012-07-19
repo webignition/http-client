@@ -7,6 +7,7 @@ before_script:
   # Installing pecl_http Module
   - printf "\n\n\n\n" | sudo pecl install pecl_http
   - echo "extension=http.so" | sudo tee $PHP_INI_PATH/http.ini  
+  - echo "extension=http.so" | sudo tee $PHP_INI_PATH/cli.ini  
   
   # Install composer for dependency management
   - wget http://getcomposer.org/composer.phar
