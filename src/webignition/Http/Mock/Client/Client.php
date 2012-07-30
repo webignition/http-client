@@ -38,6 +38,24 @@ class Client extends BaseClient {
     );
     
     /**
+     * Path for directory containing mock responses
+     * 
+     * 
+     * @var string
+     */
+    private $mockResponsesPath = null;
+    
+    
+    /**
+     *
+     * @param string $mockResponsesPath 
+     */
+    public function __construct($mockResponsesPath = null) {
+        $this->mockResponsesPath = $mockResponsesPath;
+    }
+    
+    
+    /**
      *
      * @param \HttpRequest $request
      * @return \HttpMessage
@@ -49,7 +67,7 @@ class Client extends BaseClient {
         
         if ($this->hasResponseForCommand($request)) {            
             return $this->getResponseForCommand($request);
-        } 
+        }
         
         return $this->getNotFoundResponse();
     }
@@ -60,7 +78,7 @@ class Client extends BaseClient {
      * 
      * @param \HttpRequest $request
      * @param \HttpMessage $response 
-     */
+     */    
     public function setResponseForRequest(\HttpRequest $request, \HttpMessage $response) {
         $this->responses[md5(serialize($request))] = $response;
     }
@@ -104,7 +122,13 @@ class Client extends BaseClient {
      *
      * @param string $command 
      */
-    private function hasResponseForCommand(\HttpRequest $request) {        
+    private function hasResponseForCommand(\HttpRequest $request) { 
+        if (!isset($this->responses[md5($this->requestToCommand($request))])) {
+            if ($this->hasStoredResponseForRequest($request)) {
+                $this->setResponseForCommand($this->requestToCommand($request), new \HttpMessage(file_get_contents($this->getStoredResponsePathForRequest($request))));
+            }
+        }
+        
         return isset($this->responses[md5($this->requestToCommand($request))]);
     }
     
@@ -140,6 +164,30 @@ class Client extends BaseClient {
 Date: Thu, 19 Jul 2012 07:53:22 GMT
 Server: Apache
 Content-Length: 0');          
+    }
+    
+    
+    /**
+     *
+     * @param \HttpRequest $request
+     * @return boolean
+     */
+    private function hasStoredResponseForRequest(\HttpRequest $request) {
+        if (is_null($this->mockResponsesPath)) {
+            return false;
+        }
+        
+        return file_exists($this->getStoredResponsePathForRequest($request));
+    }
+    
+    
+    /**
+     *
+     * @param \HttpRequest $request
+     * @return string
+     */
+    private function getStoredResponsePathForRequest(\HttpRequest $request) {
+        return $this->mockResponsesPath . '/' . md5($this->requestToCommand($request));
     }
     
 }
