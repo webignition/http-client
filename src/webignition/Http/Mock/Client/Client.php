@@ -51,6 +51,15 @@ class Client extends BaseClient {
      * @param string $mockResponsesPath 
      */
     public function __construct($mockResponsesPath = null) {
+        $this->setMockResponsesPath($mockResponsesPath);
+    }
+    
+    
+    /**
+     *
+     * @param string $mockResponsesPath 
+     */
+    public function setMockResponsesPath($mockResponsesPath = null) {
         $this->mockResponsesPath = $mockResponsesPath;
     }
     
