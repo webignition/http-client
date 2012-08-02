@@ -2,6 +2,8 @@
 namespace webignition\Http\Mock\Client;
 
 use webignition\Http\Client\Client as BaseClient;
+use webignition\NormalisedUrl\NormalisedUrl;
+use webignition\Http\Client\CurlException;
 
 /**
  * A HTTP client for testing. Useful for testing applications using an Http\Client
@@ -32,6 +34,12 @@ class Client extends BaseClient {
      */
     private $responses = array();    
     
+    
+    /**
+     * Map of PHP HTTP_METH_* constants to their relevant methods strings
+     * 
+     * @var array
+     */
     private $httpMethodConstantToString = array(
         HTTP_METH_GET => 'GET',
         HTTP_METH_HEAD => 'HEAD'
@@ -47,11 +55,26 @@ class Client extends BaseClient {
     
     
     /**
+     * Collection of known hosts. Used when mocking curl 'unknown host' responses
+     * 
+     * @var array
+     */
+    private $knownHosts = array();
+    
+    /**
+     *
+     * @var boolean
+     */
+    private $knowAllHosts = true;
+    
+    
+    /**
      *
      * @param string $mockResponsesPath 
      */
     public function __construct($mockResponsesPath = null) {
         $this->setMockResponsesPath($mockResponsesPath);
+        $this->knowAllHosts = true;
     }
     
     
@@ -70,6 +93,12 @@ class Client extends BaseClient {
      * @return \HttpMessage
      */    
     public function getResponse(\HttpRequest $request) {
+        $requestUrl = new NormalisedUrl($request->getUrl());
+                
+        if (!$this->knowsHost($requestUrl->getHost())) {            
+            CurlExceptionFactory::raiseCouldntResolveHostException();
+        }      
+        
         if ($this->hasResponseForRequest($request)) {
             return $this->getResponseForRequest($request);
         }
@@ -198,5 +227,74 @@ Content-Length: 0');
     private function getStoredResponsePathForRequest(\HttpRequest $request) {
         return $this->mockResponsesPath . '/' . md5($this->requestToCommand($request));
     }
+    
+    
+    /**
+     *
+     * @param string $host 
+     */
+    public function addKnownHost($host) {        
+        if (!in_array($host, $this->knownHosts)) {
+            $this->knownHosts[] = $host;
+        }
+    }
+    
+    
+    /**
+     *
+     * @param string $host 
+     */
+    public function removeKnownHost($host) {
+        if (in_array($host, $this->knownHosts)) {
+            unset($this->knownHosts[array_search($host, $this->knownHosts)]);
+        }        
+    }
+    
+    
+    /**
+     *
+     * @param string $host
+     * @return boolean
+     */
+    public function knowsHost($host) {        
+        if (is_bool($this->knowAllHosts)) {
+            return $this->knowAllHosts;
+        }
+        
+        return in_array($host, $this->knownHosts);
+    }
+    
+    
+    /**
+     * State that this client knows all possible hosts. This is the default.
+     *  
+     */
+    public function setKnowsAllHosts() {
+        $this->knowAllHosts = true;
+    }
+    
+    
+    /**
+     * State that this client knows no hosts, simulates total DNS failure. 
+     */
+    public function setKnowsNoHosts() {
+        $this->knowAllHosts = false;
+    }
+    
+    
+    /**
+     * State that this client knows only those hosts specified by $this->addKnownHost()
+     * 
+     */
+    public function setKnowsSpecifiedHostsOnly() {
+        $this->knowAllHosts = null;
+    }
+        
+      
+     
+    
+    
+    
+    
     
 }

@@ -4,7 +4,7 @@
  * Check the correct mock responses are returned for given requests
  *  
  */
-class MockHeadTest extends PHPUnit_Framework_TestCase {
+class MockHeadTest extends \PHPUnit_Framework_TestCase {
 
     public function testSetResponseForRequest() {        
         $client = new \webignition\Http\Mock\Client\Client();

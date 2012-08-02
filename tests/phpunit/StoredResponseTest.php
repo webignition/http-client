@@ -4,7 +4,7 @@
  * Check that responses stored in the filesystem can be retrieved
  *  
  */
-class StoredResponseTest extends PHPUnit_Framework_TestCase {
+class StoredResponseTest extends \PHPUnit_Framework_TestCase {
     
     public function testRetrieveStoredGetResponse() {                    
         $request = new \HttpRequest('http://example.com/sitemap.xml');        
