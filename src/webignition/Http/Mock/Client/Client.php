@@ -42,7 +42,8 @@ class Client extends BaseClient {
      */
     private $httpMethodConstantToString = array(
         HTTP_METH_GET => 'GET',
-        HTTP_METH_HEAD => 'HEAD'
+        HTTP_METH_HEAD => 'HEAD',
+        HTTP_METH_POST => 'POST'
     );
     
     /**
@@ -131,7 +132,7 @@ class Client extends BaseClient {
      * @param string $command
      * @param \HttpMessage $response 
      */
-    public function setResponseForCommand($command, \HttpMessage $response) {        
+    public function setResponseForCommand($command, \HttpMessage $response) {
         $this->responses[md5($command)] = $response;
     }
     
@@ -151,7 +152,7 @@ class Client extends BaseClient {
      * @param \HttpRequest $request
      * @return \HttpMessage 
      */
-    private function getResponseForRequest(\HttpRequest $request) {
+    private function getResponseForRequest(\HttpRequest $request) {        
         return $this->responses[md5(serialize($request))];
     }
     
@@ -160,7 +161,7 @@ class Client extends BaseClient {
      *
      * @param string $command 
      */
-    private function hasResponseForCommand(\HttpRequest $request) { 
+    private function hasResponseForCommand(\HttpRequest $request) {        
         if (!isset($this->responses[md5($this->requestToCommand($request))])) {
             if ($this->hasStoredResponseForRequest($request)) {
                 $this->setResponseForCommand($this->requestToCommand($request), new \HttpMessage(file_get_contents($this->getStoredResponsePathForRequest($request))));
@@ -176,7 +177,7 @@ class Client extends BaseClient {
      * @param \HttpRequest $request
      * @return \HttpMessage
      */
-    private function getResponseForCommand(\HttpRequest $request) {
+    private function getResponseForCommand(\HttpRequest $request) {        
         $command = $this->requestToCommand($request);        
         return $this->responses[md5($command)];
     }
@@ -188,8 +189,46 @@ class Client extends BaseClient {
      * @return string
      */
     private function requestToCommand(\HttpRequest $request) {
-        $method = (array_key_exists($request->getMethod(), $this->httpMethodConstantToString)) ? $this->httpMethodConstantToString[$request->getMethod()] : $this->httpMethodConstantToString[self::DEFAULT_COMMAND_METHOD];
-        return $method . ' ' . $request->getUrl();
+        $command = $this->getMethodForRequest($request) . ' ' . $request->getUrl();
+        
+        if ($request->getMethod() == HTTP_METH_POST) {
+            if (is_array($request->getPostFields())) {
+                $command .= ' ' . self::requestPostFieldsToCommandHash($request);
+            }
+        }        
+        
+        return $command;
+    }
+    
+    
+    /**
+     *
+     * @param \HttpRequest $request
+     * @return string 
+     */
+    public static function requestPostFieldsToCommandHash(\HttpRequest $request) {
+        if (!is_array($request->getPostFields())) {
+            return '';
+        }
+        
+        $postFields = $request->getPostFields();
+        $postFieldContent = '';
+        
+        foreach ($postFields as $key => $value) {
+            $postFieldContent .= urlencode($key) . '=' . urlencode($value);
+        }
+        
+        return md5($postFieldContent);
+    }
+    
+    
+    /**
+     * 
+     * @param \HttpRequest $request
+     * @return string
+     */
+    private function getMethodForRequest(\HttpRequest $request) {
+        return (array_key_exists($request->getMethod(), $this->httpMethodConstantToString)) ? $this->httpMethodConstantToString[$request->getMethod()] : $this->httpMethodConstantToString[self::DEFAULT_COMMAND_METHOD];
     }
     
     
