@@ -1,42 +1,42 @@
 <?php
 
+use webignition\Http\Mock\Request\PostFields\Hash;
+
 /**
  * Check the correct mock responses are returned for given requests
  *  
  */
-use \webignition\Http\Mock\Client\Client as HttpClient;
-
-class MockPostTest extends \PHPUnit_Framework_TestCase {
+class MockPostTest extends BaseTest {
 
     public function testSetResponseForRequestWithNoPostFields() {
-        $client = new HttpClient();
-        
-        $mockResponse = new \HttpMessage($this->getRawMockNoFieldsResponseMessage());
-        
         $request = new \HttpRequest('http://example.com/nofields/', HTTP_METH_POST);
-        $client->setResponseForRequest($request, $mockResponse);
         
-        $response = $client->getResponse($request);
+        $this->httpClient->getRequestResponseList()->set(
+            $request,
+            new \HttpMessage($this->getRawMockNoFieldsResponseMessage())
+        );
+        
+        $response = $this->httpClient->getResponse($request);
        
         $this->assertEquals(200, $response->getResponseCode());
         $this->assertEquals('OK', $response->getResponseStatus());
         $this->assertEquals($this->getRawMockNoFieldsResponseBody(), $response->getBody());
     }
     
-    public function testSetResponseForRequestWithPostFields() {
-        $client = new HttpClient();
-        
-        $mockResponse = new \HttpMessage($this->getRawMockFieldsResponseMessage());
-        
+    public function testSetResponseForRequestWithPostFields() {                
         $request = new \HttpRequest('http://example.com/fields/', HTTP_METH_POST);
         $request->setPostFields(array(
             'key1' => 'value1',
             'key2' => 'value2',
             'key3' => 'value3'
         ));
-        $client->setResponseForRequest($request, $mockResponse);
         
-        $response = $client->getResponse($request);
+        $this->httpClient->getRequestResponseList()->set(
+            $request,
+            new \HttpMessage($this->getRawMockFieldsResponseMessage())
+        );
+        
+        $response = $this->httpClient->getResponse($request);
        
         $this->assertEquals(200, $response->getResponseCode());
         $this->assertEquals('OK', $response->getResponseStatus());
@@ -44,26 +44,21 @@ class MockPostTest extends \PHPUnit_Framework_TestCase {
     }  
      
     
-    public function testSetResponseForCommandWithNoPostFields() {
-        $client = new HttpClient();
-        
-        $mockResponse = new \HttpMessage($this->getRawMockNoFieldsResponseMessage());
-        
+    public function testSetResponseForCommandWithNoPostFields() {                
         $request = new \HttpRequest('http://example.com/nofields/', HTTP_METH_POST);                
-        $client->setResponseForCommand('POST http://example.com/nofields/', $mockResponse);
+        $this->httpClient->getCommandResponseList()->set(
+            'POST http://example.com/nofields/',
+            new \HttpMessage($this->getRawMockNoFieldsResponseMessage())
+        );
         
-        $response = $client->getResponse($request);
+        $response = $this->httpClient->getResponse($request);
        
         $this->assertEquals(200, $response->getResponseCode());
         $this->assertEquals('OK', $response->getResponseStatus());
         $this->assertEquals($this->getRawMockNoFieldsResponseBody(), $response->getBody());
     } 
     
-    public function testSetResponseForCommandWithPostFields() {
-        $client = new HttpClient();
-        
-        $mockResponse = new \HttpMessage($this->getRawMockFieldsResponseMessage());
-        
+    public function testSetResponseForCommandWithPostFields() {        
         $request = new \HttpRequest('http://example.com/nofields/', HTTP_METH_POST);        
         $request->setPostFields(array(
             'key1' => 'value1',
@@ -71,9 +66,15 @@ class MockPostTest extends \PHPUnit_Framework_TestCase {
             'key3' => 'value3'
         ));
         
-        $client->setResponseForCommand('POST http://example.com/nofields/ ' . HttpClient::requestPostFieldsToCommandHash($request), $mockResponse);
+        $postFieldsHash = new Hash();
+        $postFieldsHash->setPostFields($request->getPostFields());        
         
-        $response = $client->getResponse($request);
+        $this->httpClient->getCommandResponseList()->set(
+            'POST http://example.com/nofields/ ' . $postFieldsHash->getHash(),
+            new \HttpMessage($this->getRawMockFieldsResponseMessage())
+        );
+        
+        $response = $this->httpClient->getResponse($request);
        
         $this->assertEquals(200, $response->getResponseCode());
         $this->assertEquals('OK', $response->getResponseStatus());

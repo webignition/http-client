@@ -4,13 +4,15 @@
  * Check that responses stored in the filesystem can be retrieved
  *  
  */
-class StoredResponseTest extends \PHPUnit_Framework_TestCase {
+class StoredResponseTest extends BaseTest {
     
-    public function testRetrieveStoredGetResponse() {                    
+    public function testRetrieveStoredGetResponse() {
         $request = new \HttpRequest('http://example.com/sitemap.xml');        
-        $client = new \webignition\Http\Mock\Client\Client(__DIR__ . '/../fixtures/httpResponses');
         
-        $response = $client->getResponse($request);
+        $this->httpClient->getStoredResponseList()->setFixturesPath(__DIR__ . '/../fixtures/httpResponses');
+
+        
+        $response = $this->httpClient->getResponse($request);
         
         $this->assertEquals('<?xml version="1.0" encoding="UTF-8"?>
 <urlset

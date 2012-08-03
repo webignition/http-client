@@ -4,18 +4,13 @@
  * Check the correct mock responses are returned for given requests
  *  
  */
-class MockHeadTest extends \PHPUnit_Framework_TestCase {
+class MockHeadTest extends BaseTest {
 
     public function testSetResponseForRequest() {        
-        $client = new \webignition\Http\Mock\Client\Client();
+        $request = new \HttpRequest('http://webignition.net/robots.txt', HTTP_METH_HEAD);
+        $this->httpClient->getRequestResponseList()->set($request, new \HttpMessage($this->getRawMockResponseMessage()));
         
-        $mockResponse = new \HttpMessage($this->getRawMockResponseMessage());
-        
-        $request = new \HttpRequest('http://webignition.net/robots.txt');
-        $request->setMethod(HTTP_METH_HEAD);
-        $client->setResponseForRequest($request, $mockResponse);
-        
-        $response = $client->getResponse($request);
+        $response = $this->httpClient->getResponse($request);
         
         $this->assertEquals(200, $response->getResponseCode());
         $this->assertEquals('OK', $response->getResponseStatus());
@@ -24,16 +19,14 @@ class MockHeadTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals('text/plain', $response->getHeader('content-type'));
     }
     
-    public function testSetResponseForCommand() {
-        $client = new \webignition\Http\Mock\Client\Client();
+    public function testSetResponseForCommand() {        
+        $request = new \HttpRequest('http://webignition.net/robots.txt', HTTP_METH_HEAD);
+        $this->httpClient->getCommandResponseList()->set(
+            'HEAD ' . $request->getUrl(),
+            new \HttpMessage($this->getRawMockResponseMessage())
+        );
         
-        $mockResponse = new \HttpMessage($this->getRawMockResponseMessage());
-        
-        $request = new \HttpRequest('http://webignition.net/robots.txt');
-        $request->setMethod(HTTP_METH_HEAD);
-        $client->setResponseForCommand('HEAD ' . $request->getUrl(), $mockResponse);
-        
-        $response = $client->getResponse($request);
+        $response = $this->httpClient->getResponse($request);
         
         $this->assertEquals(200, $response->getResponseCode());
         $this->assertEquals('OK', $response->getResponseStatus());

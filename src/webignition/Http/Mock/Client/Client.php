@@ -4,6 +4,10 @@ namespace webignition\Http\Mock\Client;
 use webignition\Http\Client\Client as BaseClient;
 use webignition\NormalisedUrl\NormalisedUrl;
 use webignition\Http\Client\CurlException;
+use webignition\Http\Mock\ResponseList;
+use webignition\Http\Mock\ResponseList\RequestResponseList;
+use webignition\Http\Mock\ResponseList\CommandResponseList;
+use webignition\Http\Mock\ResponseList\StoredResponseList;
 
 /**
  * A HTTP client for testing. Useful for testing applications using an Http\Client
@@ -22,37 +26,16 @@ use webignition\Http\Client\CurlException;
  *         requests
  *  
  */
-class Client extends BaseClient {
+class Client extends BaseClient {    
     
-    
-    const DEFAULT_COMMAND_METHOD = HTTP_METH_GET;
+    const DEFAULT_COMMAND_METHOD = HTTP_METH_GET;    
     
     /**
-     * Collection of responses that can be returned
+     * Collection of ResponseList
      * 
      * @var array
      */
-    private $responses = array();    
-    
-    
-    /**
-     * Map of PHP HTTP_METH_* constants to their relevant methods strings
-     * 
-     * @var array
-     */
-//    private $httpMethodConstantToString = array(
-//        HTTP_METH_GET => 'GET',
-//        HTTP_METH_HEAD => 'HEAD',
-//        HTTP_METH_POST => 'POST'
-//    );
-    
-    /**
-     * Path for directory containing mock responses
-     * 
-     * 
-     * @var string
-     */
-    private $mockResponsesPath = null;
+    private $responseLists = array();
     
     
     /**
@@ -66,25 +49,16 @@ class Client extends BaseClient {
      *
      * @var boolean
      */
-    private $knowAllHosts = true;
+    private $knowAllHosts = true;    
     
     
-    /**
-     *
-     * @param string $mockResponsesPath 
-     */
-    public function __construct($mockResponsesPath = null) {
-        $this->setMockResponsesPath($mockResponsesPath);
+    public function __construct() {
         $this->knowAllHosts = true;
-    }
-    
-    
-    /**
-     *
-     * @param string $mockResponsesPath 
-     */
-    public function setMockResponsesPath($mockResponsesPath = null) {
-        $this->mockResponsesPath = $mockResponsesPath;
+        $this->responseLists = array(
+            'request' => new RequestResponseList(),
+            'command' => new CommandResponseList(),
+            'stored' => new StoredResponseList()
+        );
     }
     
     
@@ -98,175 +72,21 @@ class Client extends BaseClient {
                 
         if (!$this->knowsHost($requestUrl->getHost())) {            
             CurlExceptionFactory::raiseCouldntResolveHostException();
-        }      
-        
-        if ($this->hasResponseForRequest($request)) {
-            return $this->getResponseForRequest($request);
         }
         
-        if ($this->hasResponseForCommand($request)) {            
-            return $this->getResponseForCommand($request);
+        if ($this->getRequestResponseList()->hasResponseFor($request)) {
+            return $this->getRequestResponseList()->getResponseFor($request);         
+        }        
+        
+        if ($this->getCommandResponseList()->hasResponseFor($request)) {
+            return $this->getCommandResponseList()->getResponseFor($request);
+        }
+        
+        if ($this->getStoredResponseList()->hasResponseFor($request)) {
+            return $this->getStoredResponseList()->getResponseFor($request);
         }
         
         return $this->getNotFoundResponse();
-    }
-    
-    
-    /**
-     * Set the \HttpMessage to return for a given \HttpRequest
-     * 
-     * @param \HttpRequest $request
-     * @param \HttpMessage $response 
-     */    
-    public function setResponseForRequest(\HttpRequest $request, \HttpMessage $response) {        
-        $this->responses[self::getHashForRequest($request)] = $response;
-        
-    }
-    
-    
-    /**
-     * Set the \HttpMessage to return for a given HTTP command
-     * 
-     * Example:
-     * setResponseForCommand('GET http://example.com/example', new \HttpMessage($rawResponseMessage));
-     * 
-     * @param string $command
-     * @param \HttpMessage $response 
-     */
-    public function setResponseForCommand($command, \HttpMessage $response) {
-        $this->responses[self::getHashForCommand($command)] = $response;        
-    }
-    
-    
-    /**
-     *
-     * @param \HttpRequest $request
-     * @return boolean
-     */
-    private function hasResponseForRequest(\HttpRequest $request) {
-        return isset($this->responses[self::getHashForRequest($request)]);
-    }
-    
-    
-    /**
-     *
-     * @param \HttpRequest $request
-     * @return \HttpMessage 
-     */
-    private function getResponseForRequest(\HttpRequest $request) {        
-        return $this->responses[self::getHashForRequest($request)];
-    }
-    
-    
-    /**
-     *
-     * @param string $command 
-     */
-    private function hasResponseForCommand(\HttpRequest $request) {        
-        $requestHash = self::getHashForCommand(self::requestToCommand($request));
-        
-        if (!isset($this->responses[$requestHash])) {            
-            if ($this->hasStoredResponseForRequest($request)) {
-                $this->setResponseForCommand(self::requestToCommand($request), new \HttpMessage(file_get_contents($this->getStoredResponsePathForRequest($request))));
-            }
-        }
-        
-        return isset($this->responses[$requestHash]);
-    }
-    
-    
-    /**
-     *
-     * @param \HttpRequest $request
-     * @return string
-     */
-    public static function getHashForRequest(\HttpRequest $request) {
-        return self::getHashForRequestString(serialize($request));
-    }
-    
-    
-    /**
-     *
-     * @param string $command
-     * @return string
-     */
-    public static function getHashForCommand($command) {
-        return self::getHashForRequestString($command);
-    }
-    
-    
-    /**
-     *
-     * @param string $requestString
-     * @return string
-     */
-    private static function getHashForRequestString($requestString) {
-        return md5($requestString);
-    }
-    
-    
-    /**
-     *
-     * @param \HttpRequest $request
-     * @return \HttpMessage
-     */
-    private function getResponseForCommand(\HttpRequest $request) {       
-        return $this->responses[self::getHashForCommand(self::requestToCommand($request))];
-    }
-    
-    
-    /**
-     *
-     * @param \HttpRequest $request
-     * @return string
-     */
-    public static function requestToCommand(\HttpRequest $request) {
-        $command = self::getMethodForRequest($request) . ' ' . $request->getUrl();
-        
-        if ($request->getMethod() == HTTP_METH_POST) {
-            if (is_array($request->getPostFields())) {
-                $command .= ' ' . self::requestPostFieldsToCommandHash($request);
-            }
-        }        
-        
-        return $command;
-    }
-    
-    
-    /**
-     *
-     * @param \HttpRequest $request
-     * @return string 
-     */
-    public static function requestPostFieldsToCommandHash(\HttpRequest $request) {
-        if (!is_array($request->getPostFields())) {
-            return '';
-        }
-        
-        $postFields = $request->getPostFields();
-        $postFieldContent = '';
-        
-        foreach ($postFields as $key => $value) {
-            $postFieldContent .= urlencode($key) . '=' . urlencode($value);
-        }
-        
-        return md5($postFieldContent);
-    }
-    
-    
-    /**
-     * 
-     * @param \HttpRequest $request
-     * @return string
-     */
-    private static function getMethodForRequest(\HttpRequest $request) {
-        $methods = array(
-            HTTP_METH_GET => 'GET',
-            HTTP_METH_HEAD => 'HEAD',
-            HTTP_METH_POST => 'POST'
-        );
-        
-        return (array_key_exists($request->getMethod(), $methods)) ? $methods[$request->getMethod()] : $methods[self::DEFAULT_COMMAND_METHOD];
     }
     
     
@@ -279,30 +99,6 @@ class Client extends BaseClient {
 Date: Thu, 19 Jul 2012 07:53:22 GMT
 Server: Apache
 Content-Length: 0');          
-    }
-    
-    
-    /**
-     *
-     * @param \HttpRequest $request
-     * @return boolean
-     */
-    private function hasStoredResponseForRequest(\HttpRequest $request) {
-        if (is_null($this->mockResponsesPath)) {
-            return false;
-        }
-        
-        return file_exists($this->getStoredResponsePathForRequest($request));
-    }
-    
-    
-    /**
-     *
-     * @param \HttpRequest $request
-     * @return string
-     */
-    private function getStoredResponsePathForRequest(\HttpRequest $request) {        
-        return $this->mockResponsesPath . '/' . self::getHashForCommand(self::requestToCommand($request));
     }
     
     
@@ -366,5 +162,42 @@ Content-Length: 0');
     public function setKnowsSpecifiedHostsOnly() {
         $this->knowAllHosts = null;
     }
+    
+    
+    /**
+     *
+     * @return RequestResponseList
+     */
+    public function getRequestResponseList() {
+        return $this->getResponseList('request');
+    }
+    
+    
+    /**
+     *
+     * @return CommandResponseList 
+     */
+    public function getCommandResponseList() {
+        return $this->getResponseList('command');
+    }
+    
+    
+    /**
+     *
+     * @return StoredResponseList 
+     */
+    public function getStoredResponseList() {
+        return $this->getResponseList('stored');
+    } 
+    
+    
+    /**
+     *
+     * @param string $name
+     * @return ResponseList
+     */
+    private function getResponseList($name) {
+        return $this->responseLists[$name];
+    }   
     
 }
