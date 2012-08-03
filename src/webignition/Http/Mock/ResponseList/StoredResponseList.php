@@ -60,7 +60,7 @@ class StoredResponseList extends ResponseList {
      * @param \HttpRequest $request
      * @return string
      */
-    private function getRequestFixturePath(\HttpRequest $request) {
+    public function getRequestFixturePath(\HttpRequest $request) {
         $requestCommand = new RequestCommand();
         $requestCommand->setRequest($request);
         
