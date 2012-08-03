@@ -40,11 +40,11 @@ class Client extends BaseClient {
      * 
      * @var array
      */
-    private $httpMethodConstantToString = array(
-        HTTP_METH_GET => 'GET',
-        HTTP_METH_HEAD => 'HEAD',
-        HTTP_METH_POST => 'POST'
-    );
+//    private $httpMethodConstantToString = array(
+//        HTTP_METH_GET => 'GET',
+//        HTTP_METH_HEAD => 'HEAD',
+//        HTTP_METH_POST => 'POST'
+//    );
     
     /**
      * Path for directory containing mock responses
@@ -118,8 +118,9 @@ class Client extends BaseClient {
      * @param \HttpRequest $request
      * @param \HttpMessage $response 
      */    
-    public function setResponseForRequest(\HttpRequest $request, \HttpMessage $response) {
-        $this->responses[md5(serialize($request))] = $response;
+    public function setResponseForRequest(\HttpRequest $request, \HttpMessage $response) {        
+        $this->responses[self::getHashForRequest($request)] = $response;
+        
     }
     
     
@@ -133,7 +134,7 @@ class Client extends BaseClient {
      * @param \HttpMessage $response 
      */
     public function setResponseForCommand($command, \HttpMessage $response) {
-        $this->responses[md5($command)] = $response;
+        $this->responses[self::getHashForCommand($command)] = $response;        
     }
     
     
@@ -143,7 +144,7 @@ class Client extends BaseClient {
      * @return boolean
      */
     private function hasResponseForRequest(\HttpRequest $request) {
-        return isset($this->responses[md5(serialize($request))]);
+        return isset($this->responses[self::getHashForRequest($request)]);
     }
     
     
@@ -153,7 +154,7 @@ class Client extends BaseClient {
      * @return \HttpMessage 
      */
     private function getResponseForRequest(\HttpRequest $request) {        
-        return $this->responses[md5(serialize($request))];
+        return $this->responses[self::getHashForRequest($request)];
     }
     
     
@@ -162,24 +163,15 @@ class Client extends BaseClient {
      * @param string $command 
      */
     private function hasResponseForCommand(\HttpRequest $request) {        
-        if (!isset($this->responses[md5($this->requestToCommand($request))])) {
+        $requestHash = self::getHashForCommand(self::requestToCommand($request));
+        
+        if (!isset($this->responses[$requestHash])) {            
             if ($this->hasStoredResponseForRequest($request)) {
-                $this->setResponseForCommand($this->requestToCommand($request), new \HttpMessage(file_get_contents($this->getStoredResponsePathForRequest($request))));
+                $this->setResponseForCommand(self::requestToCommand($request), new \HttpMessage(file_get_contents($this->getStoredResponsePathForRequest($request))));
             }
         }
         
-        return isset($this->responses[md5($this->requestToCommand($request))]);
-    }
-    
-    
-    /**
-     *
-     * @param \HttpRequest $request
-     * @return \HttpMessage
-     */
-    private function getResponseForCommand(\HttpRequest $request) {        
-        $command = $this->requestToCommand($request);        
-        return $this->responses[md5($command)];
+        return isset($this->responses[$requestHash]);
     }
     
     
@@ -188,8 +180,48 @@ class Client extends BaseClient {
      * @param \HttpRequest $request
      * @return string
      */
-    private function requestToCommand(\HttpRequest $request) {
-        $command = $this->getMethodForRequest($request) . ' ' . $request->getUrl();
+    public static function getHashForRequest(\HttpRequest $request) {
+        return self::getHashForRequestString(serialize($request));
+    }
+    
+    
+    /**
+     *
+     * @param string $command
+     * @return string
+     */
+    public static function getHashForCommand($command) {
+        return self::getHashForRequestString($command);
+    }
+    
+    
+    /**
+     *
+     * @param string $requestString
+     * @return string
+     */
+    private static function getHashForRequestString($requestString) {
+        return md5($requestString);
+    }
+    
+    
+    /**
+     *
+     * @param \HttpRequest $request
+     * @return \HttpMessage
+     */
+    private function getResponseForCommand(\HttpRequest $request) {       
+        return $this->responses[self::getHashForCommand(self::requestToCommand($request))];
+    }
+    
+    
+    /**
+     *
+     * @param \HttpRequest $request
+     * @return string
+     */
+    public static function requestToCommand(\HttpRequest $request) {
+        $command = self::getMethodForRequest($request) . ' ' . $request->getUrl();
         
         if ($request->getMethod() == HTTP_METH_POST) {
             if (is_array($request->getPostFields())) {
@@ -227,8 +259,14 @@ class Client extends BaseClient {
      * @param \HttpRequest $request
      * @return string
      */
-    private function getMethodForRequest(\HttpRequest $request) {
-        return (array_key_exists($request->getMethod(), $this->httpMethodConstantToString)) ? $this->httpMethodConstantToString[$request->getMethod()] : $this->httpMethodConstantToString[self::DEFAULT_COMMAND_METHOD];
+    private static function getMethodForRequest(\HttpRequest $request) {
+        $methods = array(
+            HTTP_METH_GET => 'GET',
+            HTTP_METH_HEAD => 'HEAD',
+            HTTP_METH_POST => 'POST'
+        );
+        
+        return (array_key_exists($request->getMethod(), $methods)) ? $methods[$request->getMethod()] : $methods[self::DEFAULT_COMMAND_METHOD];
     }
     
     
@@ -263,8 +301,8 @@ Content-Length: 0');
      * @param \HttpRequest $request
      * @return string
      */
-    private function getStoredResponsePathForRequest(\HttpRequest $request) {
-        return $this->mockResponsesPath . '/' . md5($this->requestToCommand($request));
+    private function getStoredResponsePathForRequest(\HttpRequest $request) {        
+        return $this->mockResponsesPath . '/' . self::getHashForCommand(self::requestToCommand($request));
     }
     
     
@@ -328,12 +366,5 @@ Content-Length: 0');
     public function setKnowsSpecifiedHostsOnly() {
         $this->knowAllHosts = null;
     }
-        
-      
-     
-    
-    
-    
-    
     
 }
