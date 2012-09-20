@@ -39,7 +39,7 @@ class Sender {
             }
         }
         
-        $exception = new \webignition\Http\Client\Exception($this->exceptions[count($this->exceptions) - 1]);
+        $exception = new \webignition\Http\Client\Exception(null, null, $this->exceptions[count($this->exceptions) - 1]);
         
         if ($this->isExceptionValid($exception, $request)) {
             throw $exception;

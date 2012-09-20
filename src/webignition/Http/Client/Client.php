@@ -2,6 +2,8 @@
 
 namespace webignition\Http\Client;
 
+use webignition\Http\Client\Exception as HttpClientException;
+
 /**
  * An HttpClient.
  * 
@@ -30,7 +32,13 @@ class Client {
      * 
      * @var boolean 
      */
-    private $outputRedirectUrls = false;
+    protected $outputRedirectUrls = false;
+    
+    /**
+     *
+     * @var string
+     */
+    protected $lastRequestedUrl = false;
    
     
     /**
@@ -38,16 +46,30 @@ class Client {
      * @param \HttpRequest $request
      * @return \HttpMessage
      */
-    public function getResponse(\HttpRequest $request) {
-        $response = $this->sender()->send($request);
+    public function getResponse(\HttpRequest $request) {        
+        $this->redirectHandler()->clearVisitedUrls();
+        $this->lastRequestedUrl = $request->getUrl();
+        $response = $this->sender()->send($request);        
         
-        while ($this->redirectHandler()->followRedirectFor($response->getResponseCode()) && !$this->redirectHandler()->isLimitReached()) { 
-            $request->setUrl($this->redirectHandler()->getLocation($request, $response));
+        while ($this->redirectHandler()->followRedirectFor($response->getResponseCode())) {
+            if ($this->redirectHandler()->isLimitReached()) {
+                throw new HttpClientException('Too many redirects', 310);
+            }
+            
+            $this->redirectHandler()->addVisitedUrl($request->getUrl());
+            $redirectUrl = $this->redirectHandler()->getLocation($request, $response);
+            
+            if ($this->redirectHandler()->hasVisited($redirectUrl)) {
+                throw new HttpClientException('Redirect loop detected', 311);
+            }
+            
+            $request->setUrl($redirectUrl);
             if ($this->outputRedirectUrls === true) {
                 echo '['.$response->getResponseCode().'] Redirecting to: '.$request->getUrl()."\n";
-            }            
+            }   
             
-            $this->redirectCount++;
+            $this->redirectHandler()->incrementRedirectCount();
+            $this->lastRequestedUrl = $request->getUrl();
             $response = $this->sender()->send($request);
         }
         
@@ -87,5 +109,14 @@ class Client {
         
         return $this->redirectHandler;
     } 
+    
+    
+    /**
+     *
+     * @return string
+     */
+    public function getLastRequestedUrl() {
+        return $this->lastRequestedUrl;
+    }
 
 }

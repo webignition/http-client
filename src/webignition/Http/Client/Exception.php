@@ -39,15 +39,19 @@ class Exception extends \Exception {
      *
      * @param \Exception $previousException 
      */
-    public function __construct(\Exception $previousException) {        
-        parent::__construct(0, null, $previousException);
-        $rootException = $this->getRootException();
+    public function __construct($message = null, $code = null, \Exception $previousException = null) {        
+        parent::__construct($message, $code, $previousException);
         
-        if (isset($rootException->curlCode) && $rootException->curlCode > 0) {
-            throw new CurlException($rootException);
-        }
+        if (!is_null($previousException)) {
+            $rootException = $this->getRootException();
 
+            if (isset($rootException->curlCode) && $rootException->curlCode > 0) {
+                throw new CurlException($rootException);
+            }            
+        }
     }
+    
+    
     
     /**
      * Get the root underyling exception

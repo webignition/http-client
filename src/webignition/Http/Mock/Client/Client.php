@@ -4,6 +4,7 @@ namespace webignition\Http\Mock\Client;
 use webignition\Http\Client\Client as BaseClient;
 use webignition\NormalisedUrl\NormalisedUrl;
 use webignition\Http\Client\CurlException;
+use webignition\Http\Client\Exception as HttpClientException;
 use webignition\Http\Mock\ResponseList;
 use webignition\Http\Mock\ResponseList\RequestResponseList;
 use webignition\Http\Mock\ResponseList\CommandResponseList;
@@ -68,8 +69,40 @@ class Client extends BaseClient {
      * @return \HttpMessage
      */    
     public function getResponse(\HttpRequest $request) {
+        $this->redirectHandler()->clearVisitedUrls();
+        $this->lastRequestedUrl = $request->getUrl();
+        
+        $response = $this->retrieveResponse($request);
+
+        while ($this->redirectHandler()->followRedirectFor($response->getResponseCode())) {
+            if ($this->redirectHandler()->isLimitReached()) {
+                throw new HttpClientException('Too many redirects', 310);
+            }
+            
+            $this->redirectHandler()->addVisitedUrl($request->getUrl());
+            $redirectUrl = $this->redirectHandler()->getLocation($request, $response);
+            
+            if ($this->redirectHandler()->hasVisited($redirectUrl)) {
+                throw new HttpClientException('Redirect loop detected', 311);
+            }
+            
+            $request->setUrl($redirectUrl);
+            if ($this->outputRedirectUrls === true) {
+                echo '['.$response->getResponseCode().'] Redirecting to: '.$request->getUrl()."\n";
+            }   
+            
+            $this->redirectHandler()->incrementRedirectCount();
+            $this->lastRequestedUrl = $request->getUrl();
+            $response = $this->retrieveResponse($request);            
+        }
+        
+        return $response;
+    }
+    
+    
+    private function retrieveResponse(\HttpRequest $request) {
         $requestUrl = new NormalisedUrl($request->getUrl());
-                
+        
         if (!$this->knowsHost($requestUrl->getHost())) {            
             CurlExceptionFactory::raiseCouldntResolveHostException();
         }
@@ -86,8 +119,8 @@ class Client extends BaseClient {
             return $this->getStoredResponseList()->getResponseFor($request);
         }
         
-        return $this->getNotFoundResponse();
-    }
+        return $this->getNotFoundResponse();        
+    }    
     
     
     /**

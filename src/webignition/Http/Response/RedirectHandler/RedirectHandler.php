@@ -43,6 +43,14 @@ class RedirectHandler {
     
     
     /**
+     * Collection of URLs previously visited, we use this to detect redirect loops
+     * 
+     * @var array
+     */
+    private $visitedUrls = array();
+    
+    
+    /**
      *
      * @return boolean
      */
@@ -55,7 +63,7 @@ class RedirectHandler {
      *
      * @return int
      */
-    private function limit() {
+    public function limit() {
         if (is_null($this->limit)) {
             return self::DEFAULT_REDIRECT_LIMIT;
         }
@@ -78,7 +86,7 @@ class RedirectHandler {
             return false;           
         }
         
-        return $this->redirectLimit = $limit;
+        return $this->limit = $limit;
     }
     
     
@@ -118,7 +126,7 @@ class RedirectHandler {
      * @param int $responseCode
      * @return boolean 
      */
-    public function followRedirectFor($responseCode) {
+    public function followRedirectFor($responseCode) {        
         return isset($this->followRedirectFor[$responseCode]) && $this->followRedirectFor[$responseCode] === true;
     }
     
@@ -156,5 +164,61 @@ class RedirectHandler {
         $absoluteUrl = new \webignition\AbsoluteUrlDeriver\AbsoluteUrlDeriver($response->getHeader('Location'), $request->getUrl());
         return $absoluteUrl->getAbsoluteUrl();
     }
-
+    
+    
+    public function incrementRedirectCount() {
+        $this->count++;
+    }
+    
+    
+    /**
+     *
+     * @return integer
+     */
+    public function getRedirectCount() {
+        return $this->count;
+    }
+    
+    
+    /**
+     *
+     * @param string $visitedUrl 
+     */
+    public function addVisitedUrl($visitedUrl) {
+        if (!in_array($visitedUrl, $this->visitedUrls)) {
+            $this->visitedUrls[] = $visitedUrl;
+        }
+    }
+    
+    
+    /**
+     *
+     * @return array
+     */
+    public function getVisitedUrls() {
+        return $this->visitedUrls;
+    }
+    
+    /**
+     *
+     * @param string $url
+     * @return boolean 
+     */
+    public function hasVisited($url) {
+        return in_array($url, $this->visitedUrls);
+    }
+    
+    
+    public function clearVisitedUrls() {
+        $this->visitedUrls = array();
+    }
+    
+    /**
+     *
+     * @return boolean
+     */
+    public function wasRedirected() {
+        return count($this->visitedUrls) > 0;
+    }
+    
 }
