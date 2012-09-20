@@ -44,6 +44,8 @@ $client->enableOutputRedirectUrls(); // For debugging
 
 $request = new \HttpRequest('http://www.ecdl.co.uk');
 $client->getResponse($request); // Debug logging of redirects occurs during request
+
+$this->assertEquals('http://www.bcs.org/category/14424', $client->getLastRequestedUrl());
 ```
 
     [301] Redirecting to: http://www.bcs.org/server.php?show=nav.5829
@@ -64,6 +66,59 @@ $response = $this->client()->getResponse($request);
 
 # HTTP client will try to send the request up to 3 times before finally failing
 ```
+
+Exceptional situations
+------------------------
+
+Odd things happen. That's just the way the world works. Here's how to spot
+some exceptional situations.
+
+### Too many redirects
+
+```php
+<?php
+$client = new \webignition\Http\Client\Client();
+$client->redirectHandler()->enable();
+
+// The redirect limit defaults to 10 if not explicitly set. We'll go for a
+// limit of 2 here to show how things work.
+$client->redirectHandler()->setLimit(2);
+
+$request = new \HttpRequest('http://www.ecdl.co.uk');
+
+try {
+    $client->getResponse($request);
+} catch (webignition\Http\Client\Exception $httpClientException) {
+    $this->assertTrue(310, $httpClientException->getCode());
+    $this->assertTrue('Too many redirects', $httpClientException->getMessage());
+}
+```
+
+### Redirect loops
+
+```php
+<?php
+$client = new \webignition\Http\Client\Client();
+$client->redirectHandler()->enable();
+
+// The redirect limit defaults to 10 if not explicitly set. We'll go for a
+// limit of 2 here to show how things work.
+$client->redirectHandler()->setLimit(2);
+
+// At the time of writing, http://themactivist.com/tag/macrumors/ 301 redirects
+// to http://themactivist.com/tag/macrumors which itself 301 redirects to
+// http://themactivist.com/tag/macrumors/. Infinitely. Bad.
+
+$request = new \HttpRequest('http://themactivist.com/tag/macrumors/');
+
+try {
+    $client->getResponse($request);
+} catch (webignition\Http\Client\Exception $httpClientException) {
+    $this->assertEquals(311, $httpClientException->getCode());
+    $this->assertEquals('Redirect loop detected', $httpClientException->getMessage());
+}
+```
+
 
 Mocking in Tests
 ----------------
