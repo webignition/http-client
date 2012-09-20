@@ -9,6 +9,8 @@ It's an HTTP client. Like, a client, talking over HTTP, to a web server. It's a 
 You give it a regular [HttpRequest][1] and it gives you back a regular [HttpMessage][2] object.
 
 * follows 30X redirects
+* has a redirect limit
+* spots redirect loops
 * retries on timeouts
 * gracefully handles (some) recoverable exception cases
 
