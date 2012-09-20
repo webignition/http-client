@@ -103,10 +103,6 @@ try {
 $client = new \webignition\Http\Client\Client();
 $client->redirectHandler()->enable();
 
-// The redirect limit defaults to 10 if not explicitly set. We'll go for a
-// limit of 2 here to show how things work.
-$client->redirectHandler()->setLimit(2);
-
 // At the time of writing, http://themactivist.com/tag/macrumors/ 301 redirects
 // to http://themactivist.com/tag/macrumors which itself 301 redirects to
 // http://themactivist.com/tag/macrumors/. Infinitely. Bad.
