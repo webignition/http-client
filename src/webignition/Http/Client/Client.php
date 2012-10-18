@@ -39,6 +39,43 @@ class Client {
      * @var string
      */
     protected $lastRequestedUrl = false;
+    
+    
+    /**
+     * User agent string to use in http requests issued
+     * Will be used if not null
+     * 
+     * @var string
+     */
+    protected $userAgent = null;
+    
+    /**
+     * 
+     * @param string $userAgent
+     */
+    public function setUserAgent($userAgent) {
+        if (is_string($userAgent)) {
+            $this->userAgent = $userAgent;
+        }        
+    }   
+    
+    
+    /**
+     * 
+     * @return string
+     */
+    public function getUserAgent() {
+        return $this->userAgent;
+    }
+    
+    
+    /**
+     * 
+     * @return boolean
+     */
+    public function hasUserAgent() {
+        return is_string($this->getUserAgent());
+    }
    
     
     /**
@@ -47,6 +84,12 @@ class Client {
      * @return \HttpMessage
      */
     public function getResponse(\HttpRequest $request) {        
+        if ($this->hasUserAgent()) {
+            $request->addHeaders(array(
+                'User-Agent' => $this->getUserAgent()
+            ));
+        }
+        
         $this->redirectHandler()->clearVisitedUrls();
         $this->lastRequestedUrl = $request->getUrl();
         $response = $this->sender()->send($request);        

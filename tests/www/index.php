@@ -1,7 +1,9 @@
 <?php
-ini_set('display_errors', 'On');
-require_once($_SERVER['DOCUMENT_ROOT'].'/../../vendor/autoload.php');
+phpinfo();
 
-$controller = new \webignition\Http\Client\Test\Controller();
-$controller->setLibraryPath(__DIR__ . '/../library');
-$controller->runTests();
+//ini_set('display_errors', 'On');
+//require_once($_SERVER['DOCUMENT_ROOT'].'/../../vendor/autoload.php');
+//
+//$controller = new \webignition\Http\Client\Test\Controller();
+//$controller->setLibraryPath(__DIR__ . '/../library');
+//$controller->runTests();
