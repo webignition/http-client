@@ -76,6 +76,15 @@ class Client {
     public function hasUserAgent() {
         return is_string($this->getUserAgent());
     }
+    
+    
+    /**
+     * Remove specific user agent that has been set, will revert to PHP default
+     * 
+     */
+    public function clearUserAgent() {
+        $this->userAgent = null;
+    }
    
     
     /**
