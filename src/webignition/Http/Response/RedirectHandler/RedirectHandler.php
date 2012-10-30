@@ -106,6 +106,25 @@ class RedirectHandler {
     
     
     /**
+     * 
+     * @return array
+     */
+    public function getRedirectableResponseCodes() {
+        return $this->redirectableResponseCodes;
+    }
+    
+    
+    /**
+     * 
+     * @param int $forResponseCode
+     * @return boolean
+     */
+    public function isEnabled($forResponseCode) {
+        return $this->followRedirectFor[$forResponseCode] == true;       
+    }
+    
+    
+    /**
      *
      * @param int $forResponseCode
      * @return null 
