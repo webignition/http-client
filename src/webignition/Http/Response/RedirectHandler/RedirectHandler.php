@@ -106,6 +106,16 @@ class RedirectHandler {
     
     
     /**
+     * Get collection of status codes for which redirection is currently enabled
+     * 
+     * @return array
+     */
+    public function getIsEnabledFor() {
+        return $this->followRedirectFor;
+    }
+    
+    
+    /**
      * 
      * @return array
      */
