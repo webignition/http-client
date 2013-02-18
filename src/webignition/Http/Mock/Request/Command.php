@@ -71,18 +71,7 @@ class Command {
      * @return string 
      */
     private function getPostFieldsHash() {
-        if (!is_array($this->request->getPostFields())) {
-            return '';
-        }
-        
-        $postFields = $this->request->getPostFields();
-        $postFieldContent = '';
-        
-        foreach ($postFields as $key => $value) {
-            $postFieldContent .= urlencode($key) . '=' . urlencode($value);
-        }
-        
-        return md5($postFieldContent);
+        return md5(json_encode($this->request->getPostFields()));
     }    
     
 }
