@@ -30,17 +30,7 @@ class Hash {
      * @return string
      */
     public function getHash() {
-        if (!is_array($this->postFields)) {
-            return '';
-        }
-
-        $postFieldContent = '';
-        
-        foreach ($this->postFields as $key => $value) {
-            $postFieldContent .= urlencode($key) . '=' . urlencode($value);
-        }
-        
-        return md5($postFieldContent);        
+        return md5(json_encode($this->postFields));       
     }
     
 }
