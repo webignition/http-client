@@ -36,6 +36,7 @@ class CurlException extends \Exception {
         34 => "CURLE_HTTP_POST_ERROR: This is an odd error that mainly occurs due to internal confusion.",
         35 => "CURLE_SSL_CONNECT_ERROR: A problem occurred somewhere in the SSL/TLS handshake. You really want the error buffer and read the message there as it pinpoints the problem slightly more. Could be certificates (file formats, paths, permissions), passwords, and others.",
         36 => "The download could not be resumed because the specified offset was out of the file boundary.",
+        37 => "A file given with FILE:// couldn't be opened. Most likely because the file path doesn't identify an existing file. Did you check file permissions?",
         47 => "Too many redirects. When following redirects, libcurl hit the maximum amount. Set your limit with CURLOPT_MAXREDIRS.",
         51 => "The remote server's SSL certificate or SSH md5 fingerprint was deemed not OK.",
         53 => "CURLE_SSL_ENGINE_NOTFOUND: The specified crypto engine wasn't found.",
