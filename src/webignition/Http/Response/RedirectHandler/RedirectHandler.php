@@ -209,6 +209,11 @@ class RedirectHandler {
     }
     
     
+    public function clearRedirectCount() {
+        $this->count = 0;
+    }
+    
+    
     /**
      *
      * @param string $visitedUrl 

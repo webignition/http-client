@@ -65,6 +65,30 @@ class RedirectTest extends BaseTest {
             $this->assertEquals(311, $exception->getCode());
         }           
     }
+    
+    
+    public function testClearRedirectLimit() {        
+        $redirectLimit = 3;
+        
+        $httpClient = new \webignition\Http\Mock\Client\Client();
+        $httpClient->getStoredResponseList()->setFixturesPath(__DIR__ . '/../fixtures/httpResponses');
+        
+        $request = new \HttpRequest('http://example.com/redirect-1/');
+
+        $httpClient->redirectHandler()->enable();        
+        $httpClient->redirectHandler()->setLimit($redirectLimit);        
+        
+        try {
+            $httpClient->getResponse($request);
+            $this->fail('HttpClientException "too many redirects" NOT raised');
+        } catch (HttpClientException $exception) {            
+            $this->assertEquals(310, $exception->getCode());
+        }
+        
+        $this->assertEquals($redirectLimit, $httpClient->redirectHandler()->getRedirectCount());
+        $httpClient->redirectHandler()->clearRedirectCount();
+        $this->assertEquals(0, $httpClient->redirectHandler()->getRedirectCount());
+    }    
 
     
 }
