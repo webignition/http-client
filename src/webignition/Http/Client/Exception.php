@@ -19,21 +19,6 @@ class Exception extends \Exception {
     
     const INVALID_URL_PREFIX = 'http://localhost/';
     
-    /**
-     * Collection of known errors to report. Key is cURL exit code, value is cUrl exit code description.
-     * @see http://curl.haxx.se/docs/manpage.html
-     * 
-     * Special case for code -1 (minus one), this is what is used when we don't know what went wrong
-     * 
-     * @var array 
-     */
-    private $messages = array(
-        -1 => 'An unknown exception occured. Examine $this->getPrevious() for details of underlying exception.',
-        6 => 'Couldn\'t resolve host. The given remote host was not resolved.',
-        3 => 'URL malformat. The syntax was not correct.',
-        28 => 'Operation timeout. The specified time-out period was reached according to the conditions.'
-    );
-    
     
     /**
      *
@@ -66,4 +51,13 @@ class Exception extends \Exception {
         
         return $rootException;
     }
+    
+    
+   /**
+     *
+     * @return boolean
+     */
+    public function hasHttpEncodingException() {        
+        return $this->getRootException() instanceof \HttpEncodingException;
+    }     
 }
