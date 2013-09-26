@@ -1,6 +1,0 @@
-HTTP/1.1 301 Moved Permanently
-Date: Thu, 20 Sep 2012 11:10:55 GMT
-Server: Apache
-Location: http://example.com/redirect-5/
-Content-Length: 0
-Content-Type: text/html
